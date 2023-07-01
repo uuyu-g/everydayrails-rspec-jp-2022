@@ -52,6 +52,7 @@ group :development, :test do
 
   gem 'rspec-rails' # add in chapter 2
   gem 'factory_bot_rails'
+  gem 'guard-rspec', require: false
 end
 
 group :development do
