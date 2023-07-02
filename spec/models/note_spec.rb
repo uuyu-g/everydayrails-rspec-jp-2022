@@ -1,26 +1,13 @@
 require "rails_helper"
 
 RSpec.describe Note, type: :model do
-  before do
-    @user =
-      User.create(
-        first_name: "Joe",
-        last_name: "Tester",
-        email: "joetester@example.com",
-        password: "dottle-nouveau-pavilion-tights-furze"
-      )
-
-    @project = @user.projects.create(name: "Test Project")
-  end
+  let(:user) { create(:user) }
+  let(:project) { create(:project, owner: user) }
 
   # ユーザー、プロジェクト、メッセージがあれば有効な状態であること
   it "is valid with a user, project and message" do
     note =
-      Note.new(
-        message: "This is a sample note.",
-        user: @user,
-        project: @project
-      )
+      Note.new(message: "This is a sample note.", user: user, project: project)
     expect(note).to be_valid
   end
 
@@ -32,26 +19,28 @@ RSpec.describe Note, type: :model do
   end
 
   describe "search message for a term" do
-    before do
-      @note1 =
-        @project.notes.create(message: "This is the first note.", user: @user)
-      @note2 =
-        @project.notes.create(message: "This is the second note.", user: @user)
-      @note3 =
-        @project.notes.create(message: "First, preheat the oven.", user: @user)
+    let!(:note1) do
+      create(:note, message: "This is the first note.", user: user)
+    end
+    let!(:note2) do
+      create(:note, message: "This is the second note.", user: user)
+    end
+    let!(:note3) do
+      create(:note, message: "First, preheat the oven.", user: user)
     end
 
     context "when a match is found" do
       # 検索文字列に一致するメモを返すこと
       it "returns notes that match the search term" do
-        expect(Note.search("first")).to include(@note1, @note3)
-        expect(Note.search("first")).to_not include(@note2)
+        expect(Note.search("first")).to include(note1, note3)
+        expect(Note.search("first")).to_not include(note2)
       end
     end
 
     context "when no match is found" do
       # 検索結果が1件も見つからなければ空のコレクションを返すこと
       it "returns an empty collection when no results are found" do
+        expect(Note.count).to eq 3
         expect(Note.search("message")).to be_empty
       end
     end
