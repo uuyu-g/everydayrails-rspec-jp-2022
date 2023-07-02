@@ -1,8 +1,12 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable
+  devise :database_authenticatable,
+         :registerable,
+         :recoverable,
+         :rememberable,
+         :trackable,
+         :validatable
 
   validates :first_name, presence: true
   validates :last_name, presence: true
@@ -25,7 +29,7 @@ class User < ApplicationRecord
   end
 
   def local?
-    ["localhost", "127.0.0.1", "0.0.0.0"].include? last_sign_in_ip
+    %w[localhost 127.0.0.1 0.0.0.0].include? last_sign_in_ip
   end
 
   def after_database_authentication
